@@ -18,6 +18,8 @@ router.post('/', (req, res) => {
         if (err) {
             console.log(err);
         } else {
+            if (recipe.id === 0) recipe.id++;
+            else recipe.id = 0;
             res.status(200).send(recipe);
         }
     })
@@ -25,19 +27,44 @@ router.post('/', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-    res.send('Get from api');
+    Recipe.find({}, (err, docs) => {
+        if (err) return console.log(err);
+        else res.status(200).send(docs);
+    });
 });
 
 router.get('/:id', (req, res) => {
-    res.send('Get from api');
+    const id = +req.params.id;
+    Recipe.find({ recipeId: id }, (err, docs) => {
+        if (err) return console.log(err);
+        else res.status(200).send(docs);
+    });
 });
 
-router.put('/', (req, res) => {
-    res.send('Get from api');
+router.put('/:id', (req, res) => {
+    const id = +req.params.id;
+    Recipe.updateOne({ recipeId: id }, { title: req.body.title, description: req.body.description }, (err, result) => {
+        if (err) return console.log(err);
+        else {
+            Recipe.find({ recipeId: id }, (err, docs) => {
+                if (err) return console.log(err);
+                else res.status(200).send(docs);
+            });
+        }
+    });
 });
 
-router.delete('/', (req, res) => {
-    res.send('Get from api');
+router.delete('/:id', (req, res) => {
+    const id = +req.params.id;
+    Recipe.remove({ recipeId: id}, (err, result) => {
+        if (err) return console.err;
+        else {
+            Recipe.find({}, (err, docs) => {
+                if (err) return console.log(err);
+                else res.status(200).send(docs);
+            });
+        }
+    });
 });
 
 module.exports = router;
