@@ -1,11 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const PORT = 3000;
+const recipes = require('./routes/recipes');
+const PORT = process.env.port || 3000;
+
 
 const app = express();
 
 app.use(bodyParser.json());
-
+app.use('/recipes', recipes);
 app.get('/', (req, res) => {
     res.send('Hello');
 });
