@@ -18,7 +18,7 @@ const recipeSchema = new Schema({
     },
     creationDate: {
         type: Date,
-        unique : false
+        unique : true
     },
 });
 
