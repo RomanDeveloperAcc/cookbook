@@ -2,11 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 
-const DB = 'mongodb+srv://dbuser:dbuserpass@cluster0-uy5xu.mongodb.net/cookbook?retryWrites=true&w=majority';
+const db = require('../assets/constants/db');
 
 const Recipe = require('../models/recipe.model');
 
-mongoose.connect(DB, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
+mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
     err ? console.log(err) : console.log('Connected to db');
 })
 
@@ -15,13 +15,8 @@ router.post('/', (req, res) => {
     let recipe = new Recipe(recipeData);
 
     recipe.save((err, recipe) => {
-        if (err) {
-            console.log(err);
-        } else {
-            if (recipe.id === 0) recipe.id++;
-            else recipe.id = 0;
-            res.status(200).send(recipe);
-        }
+        if (err) console.log(err);
+        else res.status(200).send(recipe);
     })
 
 });
@@ -29,41 +24,39 @@ router.post('/', (req, res) => {
 router.get('/', (req, res) => {
     Recipe.find({}, (err, docs) => {
         if (err) return console.log(err);
+        else if (!docs[0]) res.status(404).send('Recipes are not found');
         else res.status(200).send(docs);
     });
 });
 
 router.get('/:id', (req, res) => {
     const id = +req.params.id;
-    Recipe.find({ recipeId: id }, (err, docs) => {
+    Recipe.findOne({ recipeId: id }, (err, docs) => {
         if (err) return console.log(err);
+        else if(!docs) res.status(404).send('Recipe is not found');
         else res.status(200).send(docs);
     });
 });
 
 router.put('/:id', (req, res) => {
     const id = +req.params.id;
-    Recipe.updateOne({ recipeId: id }, { title: req.body.title, description: req.body.description }, (err, result) => {
+    Recipe.findOneAndUpdate({ recipeId: id },
+                            { title: req.body.title, description: req.body.description },
+                            { new: true },
+                            (err, result) => {
         if (err) return console.log(err);
-        else {
-            Recipe.find({ recipeId: id }, (err, docs) => {
-                if (err) return console.log(err);
-                else res.status(200).send(docs);
-            });
-        }
+        else if (!result) res.status(404).send('Recipe is not found');
+        else res.status(200).send(result);
     });
 });
 
 router.delete('/:id', (req, res) => {
     const id = +req.params.id;
-    Recipe.remove({ recipeId: id}, (err, result) => {
-        if (err) return console.err;
-        else {
-            Recipe.find({}, (err, docs) => {
-                if (err) return console.log(err);
-                else res.status(200).send(docs);
-            });
-        }
+    Recipe.findOneAndDelete({ recipeId: id},
+                            (err, result) => {
+        if (err) return console.log(err);
+        else if(!result) res.status(404).send('Recipe is not found');
+        else res.status(200).send(result);
     });
 });
 
