@@ -7,7 +7,11 @@ const connection = mongoose.createConnection(db);
 
 autoIncrement.initialize(connection);
 
-const recipeSchema = new Schema({
+const recipeHistorySchema = new Schema({
+    parentId: {
+        type: Number,
+        unique: false
+    },
     recipeId: {
         type: Number,
         unique : true
@@ -28,5 +32,5 @@ const recipeSchema = new Schema({
     },
 });
 
-recipeSchema.plugin(autoIncrement.plugin, {model: 'recipe', field: 'recipeId'});
-module.exports = mongoose.model('recipe', recipeSchema, 'recipes');
+recipeHistorySchema.plugin(autoIncrement.plugin, {model: 'recipe-history', field: 'recipeId'});
+module.exports = mongoose.model('recipe-history', recipeSchema, 'recipes-history');
