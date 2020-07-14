@@ -33,4 +33,4 @@ const recipeHistorySchema = new Schema({
 });
 
 recipeHistorySchema.plugin(autoIncrement.plugin, {model: 'recipe-history', field: 'recipeId'});
-module.exports = mongoose.model('recipe-history', recipeSchema, 'recipes-history');
+module.exports = mongoose.model('recipe-history', recipeHistorySchema, 'recipes-history');
