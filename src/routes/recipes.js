@@ -6,12 +6,15 @@ const db = require('../assets/constants/db');
 
 const Recipe = require('../models/recipe.model');
 
+const RecipeHistory = require('../models/recipe-history.model');
+
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
     err ? console.log(err) : console.log('Connected to db');
 })
 
 router.post('/', (req, res) => {
     let recipeData = req.body;
+    console.log(recipeData);
     let recipe = new Recipe(recipeData);
     recipe.creationDate = Date.now();
 
@@ -50,6 +53,8 @@ router.get('/:id', (req, res) => {
         else if(!docs) res.status(404).send('Recipe is not found');
         else res.status(200).send(docs);
     });
+
+
 });
 
 router.put('/:id', (req, res) => {
@@ -71,6 +76,11 @@ router.delete('/:id', (req, res) => {
         if (err) return console.log(err);
         else if(!result) res.status(404).send('Recipe is not found');
         else res.status(200).send(result);
+    });
+
+    RecipeHistory.deleteMany({ recipeId: id },
+        (err) => {
+            if (err) return console.log(err);
     });
 });
 

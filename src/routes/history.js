@@ -35,4 +35,14 @@ router.get('/:id', (req, res) => {
     });
 });
 
+router.get('/item/:id', (req, res) => {
+    const id = +req.params.id;
+
+    RecipeHistory.findOne({ recipeId: id }, (err, docs) => {
+        if (err) return console.log(err);
+        else if (!docs) res.status(404).send('Recipe is not found');
+        else res.status(200).send(docs);
+    });
+});
+
 module.exports = router;
