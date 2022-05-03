@@ -6,11 +6,13 @@ const db = require('../assets/constants/db');
 
 const RecipeHistory = require('../models/recipe-history.model');
 
+const api = require('./auth');
+
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
     err ? console.log(err) : console.log('Connected to db');
 })
 
-router.post('/', (req, res) => {
+router.post('/', api.verifyToken, (req, res) => {
     let recipeHistoryData = req.body;
     let recipeHistory = new RecipeHistory(recipeHistoryData);
     recipeHistory.creationDate = Date.now();
@@ -22,7 +24,7 @@ router.post('/', (req, res) => {
 
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', api.verifyToken, (req, res) => {
     const id = +req.params.id;
 
     RecipeHistory.find({parentId: id}, (err, docs) => {
@@ -35,7 +37,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.get('/item/:id', (req, res) => {
+router.get('/item/:id', api.verifyToken, (req, res) => {
     const id = +req.params.id;
 
     RecipeHistory.findOne({ recipeId: id }, (err, docs) => {
