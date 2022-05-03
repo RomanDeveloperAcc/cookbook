@@ -8,11 +8,13 @@ const Recipe = require('../models/recipe.model');
 
 const RecipeHistory = require('../models/recipe-history.model');
 
+const api = require('./auth');
+
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
     err ? console.log(err) : console.log('Connected to db');
 })
 
-router.post('/', (req, res) => {
+router.post('/', api.verifyToken, (req, res) => {
     let recipeData = req.body;
     console.log(recipeData);
     let recipe = new Recipe(recipeData);
@@ -24,7 +26,7 @@ router.post('/', (req, res) => {
     })
 });
 
-router.get('/', (req, res) => {
+router.get('/', api.verifyToken, (req, res) => {
     Recipe.find({}, (err, docs) => {
         if (err) return console.log(err);
         else if (!docs[0]) res.status(404).send('Recipes are not found');
@@ -35,7 +37,7 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/new', (req, res) => {
+router.get('/new', api.verifyToken, (req, res) => {
     Recipe.find({}, (err, docs) => {
         if (err) return console.log(err);
         else if (!docs[0]) res.status(404).send('Recipes are not found');
@@ -46,7 +48,7 @@ router.get('/new', (req, res) => {
     });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', api.verifyToken, (req, res) => {
     const id = +req.params.id;
     Recipe.findOne({ recipeId: id }, (err, docs) => {
         if (err) return console.log(err);
@@ -57,7 +59,7 @@ router.get('/:id', (req, res) => {
 
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', api.verifyToken, (req, res) => {
     const id = +req.params.id;
     Recipe.findOneAndUpdate({ recipeId: id },
                             { title: req.body.title, description: req.body.description },
@@ -69,7 +71,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', api.verifyToken, (req, res) => {
     const id = +req.params.id;
     Recipe.findOneAndDelete({ recipeId: id},
                             (err, result) => {

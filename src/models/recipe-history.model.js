@@ -3,7 +3,7 @@ const autoIncrement = require('mongoose-auto-increment');
 const Schema = mongoose.Schema;
 const db = require('../assets/constants/db');
 
-const connection = mongoose.createConnection(db);
+const connection = mongoose.createConnection(db, { useNewUrlParser: true });
 
 autoIncrement.initialize(connection);
 
